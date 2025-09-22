@@ -45,6 +45,56 @@ namespace KM_gokart
             return res; // visszaadom a kész tökéletes, ékezet mentes string-et
         }
 
+        static Dictionary<string, DateTime> Foglalas(List<Versenyzo> versenyzok, int mennyi)
+        {
+            Dictionary<string, DateTime> foglalasok = new Dictionary<string, DateTime>();
+
+            List<string> goIds = versenyzok.Select(x => x.GetId()).ToList();
+
+            string goid = "";
+            int ido = 0;
+
+            for (int i = 0; i < mennyi; i++) 
+            {
+                Console.WriteLine("Foglalás");
+                for (int j = 0; j < "Foglalás".Length; j++) Console.Write("-");
+                Console.WriteLine();
+
+                Console.WriteLine("Foglalási szabályok");
+                Console.WriteLine("\t-A pálya 8:00 és 19:00 között bérelhető");
+                Console.WriteLine("\t-min 1 óra, max 2 óra");
+
+                Console.Write("\nGokart-Id: ");
+                goid = Console.ReadLine();
+                Console.WriteLine();
+
+                Console.Write("Időre? (1óra - 2óra) percben pl: 110: ");
+                ido = int.Parse(Console.ReadLine());
+                bool eldontendo = 120 > ido && ido > 60 ? true : false;
+                ido = eldontendo ? ido : 0;
+                Console.WriteLine();
+
+                Console.Write("Időpont (év): ");
+                int ev = int.Parse(Console.ReadLine());
+                Console.WriteLine();
+
+                Console.Write("Időpont (hó): ");
+                int ho = int.Parse(Console.ReadLine());
+                Console.WriteLine();
+
+                Console.Write("Időpont (nap): ");
+                int nap = int.Parse(Console.ReadLine());
+
+                DateTime idopont = new DateTime(ev, ho, nap);
+
+                if (goid != "" && ido != 0)
+                {
+                    foglalasok.Add(goid, idopont);
+                }
+
+            }
+            return foglalasok;
+        }
 
         static List<Versenyzo> CreateVersenyzok(int count) // függvény
         {
@@ -96,7 +146,7 @@ namespace KM_gokart
             for (int i = 0; i < 10; i++)
             {
                 int randomEv = rand.Next(1950, ma.Year + 1); // 1999
-                int randomHo = rand.Next(1, ma.Month +1); // 08
+                int randomHo = rand.Next(1, ma.Month + 1); // 08
                 int randomNap = rand.Next(1, DateTime.DaysInMonth(randomEv, randomHo)); // 13
 
                 DateTime datumString = new DateTime(randomEv, randomHo, randomNap); // 1999. 08. 13.
@@ -104,7 +154,7 @@ namespace KM_gokart
                 string chosenVnev = res_vnev[rand.Next(0, res_vnev.Count - 1)]; // Bajai
                 string chosenKnev = res_knev[rand.Next(0, res_knev.Count - 1)]; // Mark
 
-                Versenyzo v = new Versenyzo(
+                versenyzok.Add(new Versenyzo(
                     chosenVnev, // Bajai
                     chosenKnev, // Mark
                     new DateTime( // DateTime objektum példányosítása
@@ -113,9 +163,8 @@ namespace KM_gokart
                         randomNap), // 13.
                     ma.Year - 18 > randomEv ? true : false, // true -> 2025-18 > 1999
                     "Go-" + chosenVnev + chosenKnev + "-" + datumString.ToString("yyyyMMdd"), // Go-BajaiMark-19990813
-                    chosenVnev.ToLower()+"."+chosenKnev.ToLower() + "@gmail.com" // bajai.mark@gmail.com
-                    );
-                versenyzok.Add(v); // versenyzok listához, a v objektum hozzáadása
+                    chosenVnev.ToLower() + "." + chosenKnev.ToLower() + "@gmail.com" // bajai.mark@gmail.com
+                    )); // versenyzok listához, a v objektum hozzáadása
             }
             return versenyzok; // visszadja a versenyzok listát, versenyzo objektumokkal
         }
@@ -139,6 +188,11 @@ namespace KM_gokart
                 this.email = email;
             }
 
+            public string GetId()
+            {
+                return vAzon;
+            }
+
             public override string ToString()
             {
                 return $"{vnev} {knev} {szulDatum.ToShortDateString()} {elmult18} {vAzon} {email}";
@@ -150,14 +204,13 @@ namespace KM_gokart
         {
             //Console.WriteLine(res_vnev[rand.Next(0, res_vnev.Count - 1)] + " " + res_knev[rand.Next(0, res_knev.Count-1)]);
 
-            List<Versenyzo> versenyzok = CreateVersenyzok(10); 
+            List<Versenyzo> versenyzok = CreateVersenyzok(10);
+            Dictionary<string, DateTime> foglalasok = Foglalas(versenyzok, 1);
 
-            foreach (Versenyzo v in versenyzok) 
-            {
-                Console.WriteLine(v);
-            }
+            foreach (var id in foglalasok.Keys) { Console.WriteLine(id); }
 
             Console.ReadKey();
         }
     }
 }
+
