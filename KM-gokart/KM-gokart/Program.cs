@@ -53,11 +53,14 @@ namespace KM_gokart
 
             List<string> goIds = versenyzok.Select(x => x.GetId()).ToList();
 
+            foreach (var item in goIds) { Console.WriteLine(item); }
+
+            Random rand = new Random();
+
             for (int i = 0; i < mennyi; i++)
             {
-                Random rand = new Random();
-
                 string goId = goIds[rand.Next(0, goIds.Count - 1)];
+                goIds.Remove(goId);
                 int ev = mai.Year;
                 int ho = mai.Month;
                 int nap = rand.Next(mai.Day, DateTime.DaysInMonth(ev, ho));
@@ -65,8 +68,11 @@ namespace KM_gokart
                 int ora = rand.Next(8, 19 + 1);
                 int perc = rand.Next(0, 59 + 1);
 
+                Console.WriteLine(ora);
+
                 DateTime idopont = new DateTime(ev, ho, nap);
 
+                
                 foglalasok.Add(goId, new List<string> { idopont.ToShortDateString(), ido.ToString(), ora.ToString(), perc.ToString() });
 
 
@@ -218,28 +224,226 @@ namespace KM_gokart
 
             List<List<string>> datumok = foglalasok.Values.ToList();
 
+            foreach(var item in datumok) { Console.WriteLine(item[2]); }
+            
             List<char> szabad = new List<char>() { 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', };
 
             Console.WriteLine("\t\t8-9\t9-10\t10-11\t11-12\t12-13\t13-14\t15-16\t16-17\t17-18\t18-19", -100);
-            for (int i = 0; i < DateTime.DaysInMonth(mai.Year, mai.Month) - mai.Day + 1; i++)
+            for (int i = 0; i < DateTime.DaysInMonth(mai.Year, mai.Month) - mai.Day+1; i++)
             {
                 string idopont = new DateTime(mai.Year, mai.Month, nap).ToShortDateString();
 
-                Console.Write($"{idopont}\t");
+                Console.Write($"{idopont} \t");
+
                 for (int j = 0; j < datumok.Count; j++)
                 {
-                    if (idopont == datumok[i][0]
-                    && (Math.Round(float.Parse(datumok[i][1])/60) > 8 && Math.Round(float.Parse(datumok[i][1]) / 60) < 9)) 
+                    if (idopont == datumok[j][0]
+                    && (int.Parse(datumok[j][2]) >= 8 && int.Parse(datumok[j][2]) <= 9)) // 9  
                     {
+                        Console.ForegroundColor = ConsoleColor.White;
+
                         Console.ForegroundColor = ConsoleColor.Red;
-                        szabad[0] = 'x';
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        for (int _ = 0; _ < 10; _++) { Console.Write(szabad[_] + "\t"); }
+                        Console.Write("X\t");
+                        for (int _ = 0; _ < 10; _++) 
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write("O\t");
+                        }
+                        Console.WriteLine();
                     }
+
+                    else if (idopont == datumok[j][0]
+                    && (int.Parse(datumok[j][2]) > 9 && int.Parse(datumok[j][2]) <= 10)) // 9  
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write("O\t");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("X\t");
+                        for (int _ = 0; _ < 9; _++)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write("O\t");
+                        }
+                        Console.WriteLine();
+                    }
+
+                    else if (idopont == datumok[j][0]
+                    && (int.Parse(datumok[j][2]) > 10 && int.Parse(datumok[j][2]) <= 11)) // 9  
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        for (int _ = 0; _ < 2; _++) 
+                        {
+                            Console.Write("O\t");
+                        }
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("X\t");
+                        for (int _ = 0; _ < 8; _++)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write("O\t");
+                        }
+                        Console.WriteLine();
+                    }
+
+                    else if (idopont == datumok[j][0]
+                    && (int.Parse(datumok[j][2]) > 11 && int.Parse(datumok[j][2]) <= 12)) // 9  
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        for (int _ = 0; _ < 3; _++)
+                        {
+                            Console.Write("O\t");
+                        }
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("X\t");
+                        for (int _ = 0; _ < 7; _++)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write("O\t");
+                        }
+                        Console.WriteLine();
+                    }
+
+                    else if (idopont == datumok[j][0]
+                    && (int.Parse(datumok[j][2]) > 12 && int.Parse(datumok[j][2]) <= 13)) // 9  
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        for (int _ = 0; _ < 4; _++)
+                        {
+                            Console.Write("O\t");
+                        }
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("X\t");
+                        for (int _ = 0; _ < 6; _++)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write("O\t");
+                        }
+                        Console.WriteLine();
+                    }
+
+                    else if (idopont == datumok[j][0]
+                    && (int.Parse(datumok[j][2]) > 13 && int.Parse(datumok[j][2]) <= 14)) // 9  
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        for (int _ = 0; _ < 5; _++)
+                        {
+                            Console.Write("O\t");
+                        }
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("X\t");
+                        for (int _ = 0; _ < 5; _++)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write("O\t");
+                        }
+                        Console.WriteLine();
+                    }
+
+                    else if (idopont == datumok[j][0]
+                    && (int.Parse(datumok[j][2]) > 14 && int.Parse(datumok[j][2]) <= 15)) // 9  
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        for (int _ = 0; _ < 6; _++)
+                        {
+                            Console.Write("O\t");
+                        }
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("X\t");
+                        for (int _ = 0; _ < 4; _++)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write("O\t");
+                        }
+                        Console.WriteLine();
+                    }
+
+                    else if (idopont == datumok[j][0]
+                    && (int.Parse(datumok[j][2]) > 15 && int.Parse(datumok[j][2]) <= 16)) // 9  
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        for (int _ = 0; _ < 7; _++)
+                        {
+                            Console.Write("O\t");
+                        }
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("X\t");
+                        for (int _ = 0; _ < 3; _++)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write("O\t");
+                        }
+                        Console.WriteLine();
+                    }
+                    else if (idopont == datumok[j][0]
+                    && (int.Parse(datumok[j][2]) > 16 && int.Parse(datumok[j][2]) <= 17)) // 9  
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        for (int _ = 0; _ < 8; _++)
+                        {
+                            Console.Write("O\t");
+                        }
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("X\t");
+                        for (int _ = 0; _ < 2; _++)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write("O\t");
+                        }
+                        Console.WriteLine();
+                    }
+
+                    else if (idopont == datumok[j][0]
+                    && (int.Parse(datumok[j][2]) > 17 && int.Parse(datumok[j][2]) <= 18)) // 9  
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        for (int _ = 0; _ < 9; _++)
+                        {
+                            Console.Write("O\t");
+                        }
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("X\t");
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write("O\t");
+                        Console.WriteLine();
+                    }
+
+                    else if (idopont == datumok[j][0]
+                    && (int.Parse(datumok[j][2]) > 18 && int.Parse(datumok[j][2]) <= 19)) // 9  
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        for (int _ = 0; _ < 10; _++)
+                        {
+                            Console.Write("O\t");
+                        }
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("X\t");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine();
+                    }
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
                 }
-                //for (int _ = 0; _ < szabad.Count; _++) { Console.Write(szabad[_] + "\t"); }
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine();
                 nap++;
             }
         }
@@ -250,7 +454,7 @@ namespace KM_gokart
             //Console.WriteLine(res_vnev[rand.Next(0, res_vnev.Count - 1)] + " " + res_knev[rand.Next(0, res_knev.Count-1)]);
 
             List<Versenyzo> versenyzok = CreateVersenyzok(10);
-            Dictionary<string, List<string>> foglalasok = Foglalas(versenyzok, 2);
+            Dictionary<string, List<string>> foglalasok = Foglalas(versenyzok, 5);
 
             kiiratas(foglalasok);
 
