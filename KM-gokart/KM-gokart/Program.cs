@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 /*
     Alföldi Racing Pilóta Nevelde
@@ -18,6 +19,7 @@ namespace KM_gokart
 {
     internal class Program
     {
+        static DateTime mai = DateTime.Now;
         static string ReplaceAccentMark(string item) // segéd függvény
         {
             List<char> ekezetek = new List<char>() { 'á', 'é', 'ű', 'ú', 'ő', 'ó', 'ü', 'ö', 'í' };
@@ -45,53 +47,63 @@ namespace KM_gokart
             return res; // visszaadom a kész tökéletes, ékezet mentes string-et
         }
 
-        static Dictionary<string, DateTime> Foglalas(List<Versenyzo> versenyzok, int mennyi)
+        static Dictionary<string, List<string>> Foglalas(List<Versenyzo> versenyzok, int mennyi)
         {
-            Dictionary<string, DateTime> foglalasok = new Dictionary<string, DateTime>();
+            Dictionary<string, List<string>> foglalasok = new Dictionary<string, List<string>>();
 
             List<string> goIds = versenyzok.Select(x => x.GetId()).ToList();
 
-            string goid = "";
-            int ido = 0;
-
-            for (int i = 0; i < mennyi; i++) 
+            for (int i = 0; i < mennyi; i++)
             {
-                Console.WriteLine("Foglalás");
-                for (int j = 0; j < "Foglalás".Length; j++) Console.Write("-");
-                Console.WriteLine();
+                Random rand = new Random();
 
-                Console.WriteLine("Foglalási szabályok");
-                Console.WriteLine("\t-A pálya 8:00 és 19:00 között bérelhető");
-                Console.WriteLine("\t-min 1 óra, max 2 óra");
+                string goId = goIds[rand.Next(0, goIds.Count - 1)];
+                int ev = mai.Year;
+                int ho = mai.Month;
+                int nap = rand.Next(mai.Day, DateTime.DaysInMonth(ev, ho));
+                int ido = rand.Next(60, 120 + 1);
+                int ora = rand.Next(8, 19 + 1);
+                int perc = rand.Next(0, 59 + 1);
 
-                Console.Write("\nGokart-Id: ");
+                DateTime idopont = new DateTime(ev, ho, nap);
+
+                foglalasok.Add(goId, new List<string> { idopont.ToShortDateString(), ido.ToString(), ora.ToString(), perc.ToString() });
+
+
+
+                /*Console.Write("\nGokart-Id: ");
                 goid = Console.ReadLine();
-                Console.WriteLine();
-
-                Console.Write("Időre? (1óra - 2óra) percben pl: 110: ");
-                ido = int.Parse(Console.ReadLine());
-                bool eldontendo = 120 > ido && ido > 60 ? true : false;
-                ido = eldontendo ? ido : 0;
-                Console.WriteLine();
 
                 Console.Write("Időpont (év): ");
                 int ev = int.Parse(Console.ReadLine());
-                Console.WriteLine();
 
                 Console.Write("Időpont (hó): ");
                 int ho = int.Parse(Console.ReadLine());
-                Console.WriteLine();
 
                 Console.Write("Időpont (nap): ");
                 int nap = int.Parse(Console.ReadLine());
 
-                DateTime idopont = new DateTime(ev, ho, nap);
+                Console.Write("Időpont (óra): ");
+                string ora = Console.ReadLine();
 
-                if (goid != "" && ido != 0)
+                Console.Write("Időpont (perc): ");
+                string perc = Console.ReadLine();
+
+                Console.Write("Időre? (1óra - 2óra) percben pl: 110: ");
+                ido = int.Parse(Console.ReadLine());
+                bool eldontendo = 120 > ido && ido > 60 ? true : false;
+                ido = eldontendo ? ido : 0;*/
+
+                /*for (int _ = 0; _ < versenyzok.Count; _++)
                 {
-                    foglalasok.Add(goid, idopont);
-                }
-
+                    if ( ido != 0
+                    && ev >= mai.Year
+                    && (ho <= 12 || ho >= mai.Month)
+                    && (nap >= mai.Day || nap <= DateTime.DaysInMonth(mai.Year, mai.Month)))
+                    {
+                        foglalasok.Add(goid, new List<string> { idopont.ToShortDateString(), ido.ToString(), ora, perc });
+                    }
+                }*/
             }
             return foglalasok;
         }
@@ -200,16 +212,51 @@ namespace KM_gokart
 
         };
 
+        static void kiiratas(Dictionary<string, List<string>> foglalasok)
+        {
+            int nap = mai.Day;
+
+            List<List<string>> datumok = foglalasok.Values.ToList();
+
+            List<char> szabad = new List<char>() { 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', };
+
+            Console.WriteLine("\t\t8-9\t9-10\t10-11\t11-12\t12-13\t13-14\t15-16\t16-17\t17-18\t18-19", -100);
+            for (int i = 0; i < DateTime.DaysInMonth(mai.Year, mai.Month) - mai.Day + 1; i++)
+            {
+                string idopont = new DateTime(mai.Year, mai.Month, nap).ToShortDateString();
+
+                Console.Write($"{idopont}\t");
+                for (int j = 0; j < datumok.Count; j++)
+                {
+                    if (idopont == datumok[i][0]
+                    && (Math.Round(float.Parse(datumok[i][1])/60) > 8 && Math.Round(float.Parse(datumok[i][1]) / 60) < 9)) 
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        szabad[0] = 'x';
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        for (int _ = 0; _ < 10; _++) { Console.Write(szabad[_] + "\t"); }
+                    }
+                }
+                //for (int _ = 0; _ < szabad.Count; _++) { Console.Write(szabad[_] + "\t"); }
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine();
+                nap++;
+            }
+        }
+
         static void Main(string[] args)
         {
+            Console.ForegroundColor = ConsoleColor.White;
             //Console.WriteLine(res_vnev[rand.Next(0, res_vnev.Count - 1)] + " " + res_knev[rand.Next(0, res_knev.Count-1)]);
 
             List<Versenyzo> versenyzok = CreateVersenyzok(10);
-            Dictionary<string, DateTime> foglalasok = Foglalas(versenyzok, 1);
+            Dictionary<string, List<string>> foglalasok = Foglalas(versenyzok, 2);
 
-            foreach (var id in foglalasok.Keys) { Console.WriteLine(id); }
+            kiiratas(foglalasok);
 
             Console.ReadKey();
+
+            
         }
     }
 }
