@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\KecskemetiMilan\\Documents\\Github\\gokaart\\KM-gokart\\",
+  "WorkspaceRootPath": "C:\\Users\\Kecskem\u00E9ti Mil\u00E1n\\Documents\\GitHub\\KM-gokart\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7DAF2ED0-0F4D-43E5-92D7-88CBADA1CACF}|KM-gokart\\KM-gokart.csproj|c:\\users\\kecskemetimilan\\documents\\github\\gokaart\\km-gokart\\km-gokart\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{7DAF2ED0-0F4D-43E5-92D7-88CBADA1CACF}|KM-gokart\\KM-gokart.csproj|c:\\users\\kecskem\u00E9ti mil\u00E1n\\documents\\github\\km-gokart\\km-gokart\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7DAF2ED0-0F4D-43E5-92D7-88CBADA1CACF}|KM-gokart\\KM-gokart.csproj|solutionrelative:km-gokart\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -18,17 +18,17 @@
           "Children": [
             {
               "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\KecskemetiMilan\\Documents\\Github\\gokaart\\KM-gokart\\KM-gokart\\Program.cs",
+              "DocumentMoniker": "C:\\Users\\Kecskem\u00E9ti Mil\u00E1n\\Documents\\GitHub\\KM-gokart\\KM-gokart\\Program.cs",
               "RelativeDocumentMoniker": "KM-gokart\\Program.cs",
-              "ToolTip": "C:\\Users\\KecskemetiMilan\\Documents\\Github\\gokaart\\KM-gokart\\KM-gokart\\Program.cs",
+              "ToolTip": "C:\\Users\\Kecskem\u00E9ti Mil\u00E1n\\Documents\\GitHub\\KM-gokart\\KM-gokart\\Program.cs",
               "RelativeToolTip": "KM-gokart\\Program.cs",
-              "ViewState": "AgIAAKwBAAAAAAAAAAAAwL4BAAAWAAAAAAAAAA==",
+              "ViewState": "AgIAAAEBAAAAAAAAAAAAAAkBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-21T19:08:40.699Z",
               "EditorCaption": ""
