@@ -22,8 +22,12 @@ namespace KM_gokart
         static DateTime mai = DateTime.Now;
         static string ReplaceAccentMark(string item) // segéd függvény
         {
-            List<char> ekezetek = new List<char>() { 'á', 'é', 'ű', 'ú', 'ő', 'ó', 'ü', 'ö', 'í' };
-            List<char> ekezetek_ = new List<char>() { 'a', 'e', 'u', 'u', 'o', 'o', 'u', 'o', 'i' };
+            List<char> ekezetek = new List<char>() {
+                'á', 'é', 'ű', 'ú', 'ő', 'ó', 'ü', 'ö', 'í',
+                'Á', 'É', 'Ű', 'Ú', 'Ő', 'Ó', 'Ü', 'Ö', 'Í' };
+            List<char> ekezetek_ = new List<char>() {
+                'a', 'e', 'u', 'u', 'o', 'o', 'u', 'o', 'i',
+                'A', 'E', 'U', 'U', 'O', 'O', 'U', 'O', 'I'};
             string res = "";
 
             for (int i = 0; i < item.Length; i++) // kovács 
