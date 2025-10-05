@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 
 /*
     Alföldi Racing Pilóta Nevelde
@@ -19,156 +22,6 @@ namespace KM_gokart
 {
     internal class Program
     {
-        static DateTime mai = DateTime.Now;
-        static string ReplaceAccentMark(string item) // segéd függvény
-        {
-            List<char> ekezetek = new List<char>() {
-                'á', 'é', 'ű', 'ú', 'ő', 'ó', 'ü', 'ö', 'í',
-                'Á', 'É', 'Ű', 'Ú', 'Ő', 'Ó', 'Ü', 'Ö', 'Í' };
-            List<char> ekezetek_ = new List<char>() {
-                'a', 'e', 'u', 'u', 'o', 'o', 'u', 'o', 'i',
-                'A', 'E', 'U', 'U', 'O', 'O', 'U', 'O', 'I'};
-            string res = "";
-
-            for (int i = 0; i < item.Length; i++) // kovács 
-            {
-                bool cserelve = false; // false false false true false false
-                for (int j = 0; j < ekezetek.Count; j++)
-                {
-                    if (item[i] == ekezetek[j])
-                    {
-                        res += ekezetek_[j]; // k o v (á)->a
-                        cserelve = true; // true
-                        break;
-                    }
-                }
-                if (!cserelve)
-                {
-                    res += item[i]; // k o v c s
-                }
-            }
-
-            return res; // visszaadom a kész tökéletes, ékezet mentes string-et
-        }
-
-        static Dictionary<string, List<string>> Foglalas(List<Versenyzo> versenyzok, int mennyi)
-        {
-            Dictionary<string, List<string>> foglalasok = new Dictionary<string, List<string>>();
-
-            List<string> goIds = versenyzok.Select(x => x.GetId()).ToList();
-
-            foreach (var item in goIds) { Console.WriteLine(item); }
-            Console.WriteLine();
-            for (int i = 0; i < mennyi; i++)
-            {
-
-                Console.Write("\nGokart-Id: ");
-                string goid = Console.ReadLine();
-
-                Console.Write("Időpont (év): ");
-                int ev = int.Parse(Console.ReadLine());
-
-                Console.Write("Időpont (hó): ");
-                int ho = int.Parse(Console.ReadLine());
-
-                Console.Write("Időpont (nap): ");
-                int nap = int.Parse(Console.ReadLine());
-
-                Console.Write("Időpont (óra): ");
-                string ora = Console.ReadLine();
-
-                Console.Write("Időre? (1óra - 2óra) percben pl: 110: ");
-                int ido = int.Parse(Console.ReadLine());
-                bool eldontendo = 120 > ido && ido > 60 ? true : false;
-                ido = eldontendo ? ido : 0;
-
-                DateTime idopont = new DateTime(ev, ho, nap, 0, 0, 0);
-
-                if (versenyzok.Any(x => x.GetId() == goid)
-            && ido != 0
-            && ev >= mai.Year
-            && (ho <= 12 || ho >= mai.Month)
-            && (nap >= mai.Day || nap <= DateTime.DaysInMonth(mai.Year, mai.Month)))
-                {
-                    foglalasok.Add(goid, new List<string> { idopont.ToShortDateString(), ido.ToString(), ora });
-                }
-            }
-            return foglalasok;
-        }
-
-        static List<Versenyzo> CreateVersenyzok(int count) // függvény
-        {
-            List<string> knev = File.ReadAllLines("keresztnevek.txt").ToList(); // beolvasom a txt fájlt, és elmentem Listába (ToList())
-            List<string> vnev = File.ReadAllLines("vezeteknevek.txt").ToList(); // beolvasom a txt fájlt, és elmentem Listába (ToList())
-
-            List<string> res_knev = new List<string>();
-            List<string> res_vnev = new List<string>();
-
-            foreach (string sor in knev) // bejárom a knev-et
-            {
-                string[] reszek = sor.Split(','); // split-elem "," alapján, ebből kapom meg a reszek tömböt
-                foreach (string resz in reszek) // bejárom a részek tömböt
-                {
-                    if (resz.Contains("'")) // részek tömb elemeinél megvizsgálom van-e benne "'"
-                    {
-                        // ha van
-                        string a = resz.Replace("'", ""); // a Replace metódussal kicserélem a "'" -> üresre ""
-                        res_knev.Add(ReplaceAccentMark(a).Trim()); // res_vnev listához adom a kapott vnev-et, majd
-                                                                   // ReplaceAccentMark függvénnyel megoldom,
-                                                                   // hogy ne legyen ékezetes
-                                                                   // és végül eltüntetem a felesleges white space-eket a Trim metódussal
-                    }
-                }
-            }
-
-            foreach (string sor in vnev) // bejárom a vnev-et
-            {
-                string[] reszek = sor.Split(','); // split-elem "," alapján, ebből kapom meg a reszek tömböt
-                foreach (string resz in reszek) // bejárom a részek tömböt
-                {
-                    if (resz.Contains("'")) // részek tömb elemeinél megvizsgálom van-e benne "'"
-                    {
-                        // ha van
-                        string a = resz.Replace("'", ""); // a Replace metódussal kicserélem a "'" -> üresre ""
-                        res_vnev.Add(ReplaceAccentMark(a).Trim()); // res_vnev listához adom a kapott vnev-et, majd
-                                                                   // ReplaceAccentMark függvénnyel megoldom,
-                                                                   // hogy ne legyen ékezetes
-                                                                   // és végül eltüntetem a felesleges white space-eket a Trim metódussal
-                    }
-                }
-            }
-
-            List<Versenyzo> versenyzok = new List<Versenyzo>();
-
-            Random rand = new Random(); // random objektum példányosítása
-            DateTime ma = DateTime.Now; // jelenlegi dátum
-
-            for (int i = 0; i < 10; i++)
-            {
-                int randomEv = rand.Next(1950, ma.Year + 1); // 1999
-                int randomHo = rand.Next(1, ma.Month + 1); // 08
-                int randomNap = rand.Next(1, DateTime.DaysInMonth(randomEv, randomHo)); // 13
-
-                DateTime datumString = new DateTime(randomEv, randomHo, randomNap); // 1999. 08. 13.
-
-                string chosenVnev = res_vnev[rand.Next(0, res_vnev.Count - 1)]; // Bajai
-                string chosenKnev = res_knev[rand.Next(0, res_knev.Count - 1)]; // Mark
-
-                versenyzok.Add(new Versenyzo(
-                    chosenVnev, // Bajai
-                    chosenKnev, // Mark
-                    new DateTime( // DateTime objektum példányosítása
-                        randomEv,  // 1999.
-                        randomHo, // 08.
-                        randomNap), // 13.
-                    ma.Year - 18 > randomEv ? true : false, // true -> 2025-18 > 1999
-                    "Go-" + chosenVnev + chosenKnev + "-" + datumString.ToString("yyyyMMdd"), // Go-BajaiMark-19990813
-                    chosenVnev.ToLower() + "." + chosenKnev.ToLower() + "@gmail.com" // bajai.mark@gmail.com
-                    )); // versenyzok listához, a v objektum hozzáadása
-            }
-            return versenyzok; // visszadja a versenyzok listát, versenyzo objektumokkal
-        }
-
         public class Versenyzo
         {
             private string vnev;
@@ -195,12 +48,295 @@ namespace KM_gokart
 
             public override string ToString()
             {
-                return $"{vnev} {knev} {szulDatum.ToShortDateString()} {elmult18} {vAzon} {email}";
+                return $"|{vnev,-13} | {knev,-13} | {szulDatum.ToShortDateString(),-10} | {elmult18,-6} | {vAzon,-35} | {email,-35} |";
             }
-
         };
 
-        static void kiiratas(Dictionary<string, List<string>> foglalasok)
+        static DateTime mai = DateTime.Now;
+
+        static List<string> fejlec = new List<string>()
+        {
+            "Alföldi Racing Pilóta Nevelde",
+            "6100, Kiskunfélegyháza 4625 fő út, 4. düllő",
+            "+36-02-001-0911",
+            "alfoldi-pilota.hu"
+        };
+
+        static Dictionary<int, string> opportunities = new Dictionary<int, string>()
+        {
+            {1, "Versenyzők megtekintése" },
+            {2, "Foglalások megtekintése" },
+            {3, "Foglalás" },
+            {4, "Foglalás módosítás" },
+            {5, "Kilépés" },
+        };
+
+        static Dictionary<string, List<string>> foglalasok = new Dictionary<string, List<string>>();
+
+        static void Fejlec()
+        {
+            for (int i = 0; i < 46; i++) Console.Write("_");
+            Console.WriteLine();
+            foreach (string f in fejlec)
+            {
+                Console.Write($"|{f,-45}|\n");
+            }
+            Console.Write("|");
+            for (int i = 0; i < 45; i++) Console.Write("_");
+            Console.WriteLine("|");
+            Console.WriteLine();
+        }
+
+        static void ChangeAppointment()
+        {
+
+            string cim = "Jelenlegi foglalások: ";
+            Console.WriteLine(cim);
+            for (int i = 0; i < cim.Length; i++) Console.Write("-");
+            Console.WriteLine();
+
+            foreach (KeyValuePair<string, List<string>> f in foglalasok)
+            {
+                Console.WriteLine($"\t{f.Key}: dátum:{f.Value[0]} tartam(óra):{f.Value[1]} óra:{f.Value[2]}");
+            }
+
+            Console.WriteLine();
+            Console.Write("Cserélni(mennyit): ");
+            int mennyi = int.Parse(Console.ReadLine());
+
+            for (int i = 0; i < mennyi; i++)
+            {
+                Console.Write("Gokart Azonosító: ");
+                string goid = Console.ReadLine();
+                Console.WriteLine();
+
+                if (foglalasok.ContainsKey(goid))
+                {
+                    Console.WriteLine("Cserélendő adatok: ");
+
+                    Console.Write("Dátum(éééé. hh. nn.): ");
+                    string datum = Console.ReadLine();
+                    DateTime Datum = new DateTime();
+
+                    foreach (char d in datum)
+                    {
+                        string[] resz = datum.Split('.');
+                        int ev = int.Parse(resz[0].Trim());
+                        int ho = int.Parse(resz[1].Trim());
+                        int nap = int.Parse(resz[2].Trim());
+                        Datum = new DateTime(ev, ho, nap);
+                    }
+
+                    Console.Write("Óra: ");
+                    int ora = int.Parse(Console.ReadLine());
+
+                    Console.Write("Tartam(1óra vagy 2óra): ");
+                    int tartam = int.Parse(Console.ReadLine());
+
+                    foglalasok[goid] = new List<string>
+                    {
+                        Datum.ToShortDateString(),
+                        tartam.ToString(),
+                        ora.ToString()
+                    };
+                }
+            }
+        }
+
+        static string ReplaceAccentMark(string item) 
+        {
+            List<char> ekezetek = new List<char>() {
+                'á', 'é', 'ű', 'ú', 'ő', 'ó', 'ü', 'ö', 'í',
+                'Á', 'É', 'Ű', 'Ú', 'Ő', 'Ó', 'Ü', 'Ö', 'Í' };
+            List<char> ekezetek_ = new List<char>() {
+                'a', 'e', 'u', 'u', 'o', 'o', 'u', 'o', 'i',
+                'A', 'E', 'U', 'U', 'O', 'O', 'U', 'O', 'I'};
+            string res = "";
+
+            for (int i = 0; i < item.Length; i++) 
+            {
+                bool cserelve = false; 
+                for (int j = 0; j < ekezetek.Count; j++)
+                {
+                    if (item[i] == ekezetek[j])
+                    {
+                        res += ekezetek_[j]; 
+                        cserelve = true; 
+                        break;
+                    }
+                }
+                if (!cserelve)
+                {
+                    res += item[i]; 
+                }
+            }
+
+            return res; 
+        }
+
+        static void Appoint(List<Versenyzo> versenyzok, int mennyi)
+        {
+
+            List<string> goIds = versenyzok.Select(x => x.GetId()).ToList();
+
+            foreach (var item in goIds) { Console.WriteLine(item); }
+            Console.WriteLine();
+
+            string cim = "Foglalási szabályok";
+            Console.WriteLine(cim);
+            for (int i = 0; i < cim.Length; i++) Console.Write("-");
+            Console.WriteLine("\n\t×8-19-ig");
+            Console.WriteLine("\t×min 1óra, max 2óra");
+            Console.WriteLine("\t×Az aktuális naptól, hónap végéig");
+            Console.WriteLine("\t×Egy pilóta egyszer foglalhat");
+
+            for (int i = 0; i < mennyi; i++)
+            {
+
+                Console.Write("\nGokart-Id: ");
+                string goid = Console.ReadLine();
+
+                Console.Write("Időpont (év): ");
+                int ev = int.Parse(Console.ReadLine());
+
+                Console.Write("Időpont (hó): ");
+                int ho = int.Parse(Console.ReadLine());
+
+                Console.Write("Időpont (nap): ");
+                int nap = int.Parse(Console.ReadLine());
+
+                Console.Write("Időpont (óra): ");
+                string ora = Console.ReadLine().Trim();
+
+                Console.Write("Időre? (1óra vagy 2óra): ");
+                int ido = int.Parse(Console.ReadLine().Trim());
+                bool eldontendo = 2 >= ido && ido >= 1 ? true : false;
+                ido = eldontendo ? ido : 0;
+
+                DateTime idopont = new DateTime(ev, ho, nap);
+
+                List<int> vegekUj = new List<int>();
+                List<int> vegekRegi = new List<int>();
+
+                
+                for (int j = 0; j < ido; j++)
+                {
+                    vegekUj.Add(int.Parse(ora) + j);
+                }
+
+                
+                foreach (var f in foglalasok.Values)
+                {
+                    if (f[0] == idopont.ToShortDateString()) 
+                    {
+                        int kezd = int.Parse(f[2]);
+                        int tartam = int.Parse(f[1]);
+                        for (int j = 0; j < tartam; j++)
+                        {
+                            vegekRegi.Add(kezd + j);
+                        }
+                    }
+                }
+
+                
+                bool atfedes = vegekUj.Intersect(vegekRegi).Any();
+
+                if (!atfedes) 
+                {
+                    if (versenyzok.Any(x => x.GetId() == goid)
+                        && ido != 0
+                        && ev == mai.Year
+                        && (ho <= 12 && ho == mai.Month)
+                        && (nap >= mai.Day && nap <= DateTime.DaysInMonth(mai.Year, mai.Month))
+                        && int.Parse(ora) >= 8 && int.Parse(ora) < 19 && int.Parse(ora) + ido <= 19)
+                    {
+                        foglalasok.Add(goid, new List<string> { idopont.ToShortDateString(), ido.ToString(), ora });
+                    }
+                }
+
+                {
+                    /*if (versenyzok.Any(x => x.GetId() == goid)
+                        && ido != 0
+                        && ev == mai.Year
+                        && (ho <= 12 && ho == mai.Month)
+                        && (nap >= mai.Day && nap <= DateTime.DaysInMonth(mai.Year, mai.Month)
+                        && int.Parse(ora) >= 8 && int.Parse(ora) < 19))
+                    {
+                        foglalasok.Add(goid, new List<string> { idopont.ToShortDateString(), ido.ToString(), ora });
+                    }*/
+                }
+            }
+        }
+
+
+        static List<Versenyzo> CreateVersenyzok(int count) 
+        {
+            List<string> knev = File.ReadAllLines("keresztnevek.txt").ToList(); 
+            List<string> vnev = File.ReadAllLines("vezeteknevek.txt").ToList(); 
+
+            List<string> res_knev = new List<string>();
+            List<string> res_vnev = new List<string>();
+
+            foreach (string sor in knev) 
+            {
+                string[] reszek = sor.Split(','); 
+                foreach (string resz in reszek) 
+                {
+                    if (resz.Contains("'")) 
+                    {
+                        
+                        string a = resz.Replace("'", ""); 
+                        res_knev.Add(ReplaceAccentMark(a).Trim()); 
+                    }
+                }
+            }
+
+            foreach (string sor in vnev) 
+            {
+                string[] reszek = sor.Split(','); 
+                foreach (string resz in reszek) 
+                {
+                    if (resz.Contains("'")) 
+                    {
+                        
+                        string a = resz.Replace("'", ""); 
+                        res_vnev.Add(ReplaceAccentMark(a).Trim());
+                    }
+                }
+            }
+
+            List<Versenyzo> versenyzok = new List<Versenyzo>();
+
+            Random rand = new Random(); 
+            DateTime ma = DateTime.Now; 
+
+            for (int i = 0; i < count; i++)
+            {
+                int randomEv = rand.Next(1950, ma.Year + 1); 
+                int randomHo = rand.Next(1, ma.Month + 1);
+                int randomNap = rand.Next(1, DateTime.DaysInMonth(randomEv, randomHo)); 
+
+                DateTime datumString = new DateTime(randomEv, randomHo, randomNap); 
+
+                string chosenVnev = res_vnev[rand.Next(0, res_vnev.Count - 1)];
+                string chosenKnev = res_knev[rand.Next(0, res_knev.Count - 1)]; 
+
+                versenyzok.Add(new Versenyzo(
+                    chosenVnev, 
+                    chosenKnev, 
+                    new DateTime( 
+                        randomEv,  
+                        randomHo, 
+                        randomNap), 
+                    ma.Year - 18 > randomEv ? true : false, 
+                    "Go-" + chosenVnev + chosenKnev + "-" + datumString.ToString("yyyyMMdd"), 
+                    chosenVnev.ToLower() + "." + chosenKnev.ToLower() + "@gmail.com" 
+                    )); 
+            }
+            return versenyzok; 
+        }
+
+        static void PrintOut(Dictionary<string, List<string>> foglalasok)
         {
             int nap = mai.Day;
 
@@ -222,44 +358,47 @@ namespace KM_gokart
                 Console.Write($"\n{idopont} \t");
 
                 List<int> orak = new List<int>();
-                foreach (var d in datumok)
+                List<int> tartamLista = new List<int>();
+
+                for(int i = 0; i < datumok.Count; i++)
+        {
+                if (datumok[i][0] == idopont)
                 {
-                    if (d[0] == idopont)
-                    {
-                        orak.Add(int.Parse(d[2]));
-                    }
+                    orak.Add(int.Parse(datumok[i][2]));
+                    tartamLista.Add(int.Parse(tartamok[i]));
                 }
+            }
 
-                for(int k = 0; k < 11; k++) 
+            for (int k = 0; k < 11; k++) 
                 {
-                int ora = 8 + k;
-                bool foglalt = false;
+                    int ora = 8 + k;
+                    bool foglalt = false;
 
-                for (int i = 0; i < orak.Count; i++)
-                    {
-                    int kezd = orak[i];                
-                    int tartam = int.Parse(tartamok[i]); 
-                    int veg = kezd + tartam / 60;      
+                    for (int i = 0; i < orak.Count; i++)
+                        {
+                        int kezd = orak[i];                
+                        int tartam = int.Parse(tartamok[i]); 
+                        int veg = kezd + tartam;      
 
 
-                    if (ora >= kezd && ora <= veg)
-                    {
-                        foglalt = true;
-                        break;
+                        if (ora >= kezd && ora < veg)
+                        {
+                            foglalt = true;
+                            break;
+                        }
                     }
-                }
 
-                if (foglalt)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.Write("X\t");
+                    if (foglalt)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write("X\t");
+                        }
+                    else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write("O\t");
+                        }
                     }
-                else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.Write("O\t");
-                    }
-                }
 
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.White;
@@ -269,15 +408,89 @@ namespace KM_gokart
         }
 
             static void Main(string[] args)
-        {
+            {
             Console.ForegroundColor = ConsoleColor.White;
             //Console.WriteLine(res_vnev[rand.Next(0, res_vnev.Count - 1)] + " " + res_knev[rand.Next(0, res_knev.Count-1)]);
 
-            List<Versenyzo> versenyzok = CreateVersenyzok(10);
-            Dictionary<string, List<string>> foglalasok = Foglalas(versenyzok, 2);
+            foglalasok = new Dictionary<string, List<string>>();
 
-            kiiratas(foglalasok);
+            List<Versenyzo> versenyzok = CreateVersenyzok(150);
 
+            bool run = true;
+            bool kiiratva = false;
+
+            while (run)
+            {
+                Fejlec();
+                Console.WriteLine("Üdvözöllek az Alföldi Racing Pilóta Nevelde gokart pályán!\n");
+
+                foreach (KeyValuePair<int, string> o in opportunities)
+                {
+                    Console.WriteLine("\t" + o.Key + ": " + o.Value);
+                }
+                Console.WriteLine();
+
+                Console.Write(">: ");
+                int choice = int.Parse(Console.ReadLine());
+                switch (choice)
+                {
+                    case 1:
+                        Console.Clear();
+                        Fejlec();
+                        if (!(kiiratva))
+                        {
+                            Console.WriteLine("\nVersenyzők: ");
+                            foreach (var v in versenyzok)
+                            {
+                                Console.Write(v + "\n");
+                            }
+                        }
+                        kiiratva = true;
+                        Console.WriteLine();
+                        System.Threading.Thread.Sleep(2000);
+                        break;
+                    case 2:
+                        Console.Clear();
+                        Fejlec();
+                        Console.WriteLine();
+                        string cim = "Jelenlegi foglalások";
+                        Console.WriteLine(cim);
+                        for(int i = 0; i < cim.Length; i++) Console.Write("-");
+                        Console.WriteLine();
+                        foreach(KeyValuePair<string, List<string>> f in foglalasok) 
+                        {
+                            Console.WriteLine($"\t{f.Key}: dátum:{f.Value[0]} tartam(óra):{f.Value[1]} óra:{f.Value[2]}");
+                        }
+                        Console.WriteLine();
+                        PrintOut(foglalasok);
+
+                        System.Threading.Thread.Sleep(2000);
+                        break;
+
+                    case 3:
+                        Console.Clear();
+                        Fejlec();
+                        Console.Write("Hány emberre szeretnél foglalni: ");
+                        int mennyi = int.Parse(Console.ReadLine());
+                        Appoint(versenyzok, mennyi);
+                        Console.WriteLine();
+                        System.Threading.Thread.Sleep(2000);
+                        Console.Clear();
+                        break;
+                    case 4:
+                        Console.Clear();
+                        Fejlec();
+                        ChangeAppointment();
+                        Console.WriteLine();
+                        System.Threading.Thread.Sleep(2000);
+                        Console.Clear();
+                        break;
+                    case 5:
+                        Console.WriteLine("A program leállt.");
+                        run = false;
+                        break;
+                }
+            }
             Console.ReadKey();
 
             
