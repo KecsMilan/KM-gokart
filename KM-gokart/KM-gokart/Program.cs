@@ -90,6 +90,13 @@ namespace KM_gokart
         static void ChangeAppointment()
         {
 
+            List<string> foglalasokDatum = new List<string>();
+
+            foreach (var item in foglalasok.Values) 
+            {
+                foglalasokDatum.Add(item[0]);
+            }
+
             string cim = "Jelenlegi foglalások: ";
             Console.WriteLine(cim);
             for (int i = 0; i < cim.Length; i++) Console.Write("-");
@@ -133,17 +140,24 @@ namespace KM_gokart
                     Console.Write("Tartam(1óra vagy 2óra): ");
                     int tartam = int.Parse(Console.ReadLine());
 
-                    foglalasok[goid] = new List<string>
+                    if (foglalasokDatum.Any(x => Convert.ToDateTime(x) < Datum))
                     {
-                        Datum.ToShortDateString(),
-                        tartam.ToString(),
-                        ora.ToString()
-                    };
+                        foglalasok[goid] = new List<string>
+                        {
+                            Datum.ToShortDateString(),
+                            tartam.ToString(),
+                            ora.ToString()
+                        };
+                    }
+                    else 
+                    {
+                        Console.WriteLine("Nem lehetséges");
+                    }
                 }
             }
         }
 
-        static string ReplaceAccentMark(string item) 
+        static string ReplaceAccentMark(string item)
         {
             List<char> ekezetek = new List<char>() {
                 'á', 'é', 'ű', 'ú', 'ő', 'ó', 'ü', 'ö', 'í',
@@ -153,25 +167,25 @@ namespace KM_gokart
                 'A', 'E', 'U', 'U', 'O', 'O', 'U', 'O', 'I'};
             string res = "";
 
-            for (int i = 0; i < item.Length; i++) 
+            for (int i = 0; i < item.Length; i++)
             {
-                bool cserelve = false; 
+                bool cserelve = false;
                 for (int j = 0; j < ekezetek.Count; j++)
                 {
                     if (item[i] == ekezetek[j])
                     {
-                        res += ekezetek_[j]; 
-                        cserelve = true; 
+                        res += ekezetek_[j];
+                        cserelve = true;
                         break;
                     }
                 }
                 if (!cserelve)
                 {
-                    res += item[i]; 
+                    res += item[i];
                 }
             }
 
-            return res; 
+            return res;
         }
 
         static void Appoint(List<Versenyzo> versenyzok, int mennyi)
@@ -218,16 +232,16 @@ namespace KM_gokart
                 List<int> vegekUj = new List<int>();
                 List<int> vegekRegi = new List<int>();
 
-                
+
                 for (int j = 0; j < ido; j++)
                 {
                     vegekUj.Add(int.Parse(ora) + j);
                 }
 
-                
+
                 foreach (var f in foglalasok.Values)
                 {
-                    if (f[0] == idopont.ToShortDateString()) 
+                    if (f[0] == idopont.ToShortDateString())
                     {
                         int kezd = int.Parse(f[2]);
                         int tartam = int.Parse(f[1]);
@@ -238,10 +252,10 @@ namespace KM_gokart
                     }
                 }
 
-                
+
                 bool atfedes = vegekUj.Intersect(vegekRegi).Any();
 
-                if (!atfedes) 
+                if (!atfedes)
                 {
                     if (versenyzok.Any(x => x.GetId() == goid)
                         && ido != 0
@@ -253,53 +267,45 @@ namespace KM_gokart
                         foglalasok.Add(goid, new List<string> { idopont.ToShortDateString(), ido.ToString(), ora });
                     }
                 }
-
+                else
                 {
-                    /*if (versenyzok.Any(x => x.GetId() == goid)
-                        && ido != 0
-                        && ev == mai.Year
-                        && (ho <= 12 && ho == mai.Month)
-                        && (nap >= mai.Day && nap <= DateTime.DaysInMonth(mai.Year, mai.Month)
-                        && int.Parse(ora) >= 8 && int.Parse(ora) < 19))
-                    {
-                        foglalasok.Add(goid, new List<string> { idopont.ToShortDateString(), ido.ToString(), ora });
-                    }*/
+                    Console.WriteLine("Nem lehetséges");
                 }
             }
         }
 
 
-        static List<Versenyzo> CreateVersenyzok(int count) 
+        static List<Versenyzo> CreateVersenyzok(int count)
         {
-            List<string> knev = File.ReadAllLines("keresztnevek.txt").ToList(); 
-            List<string> vnev = File.ReadAllLines("vezeteknevek.txt").ToList(); 
+            List<string> knev = File.ReadAllLines("keresztnevek.txt").ToList();
+            List<string> vnev = File.ReadAllLines("vezeteknevek.txt").ToList();
 
             List<string> res_knev = new List<string>();
             List<string> res_vnev = new List<string>();
 
-            foreach (string sor in knev) 
+            foreach (string sor in knev)
             {
-                string[] reszek = sor.Split(','); 
-                foreach (string resz in reszek) 
+                string[] reszek = sor.Split(',');
+                foreach (string resz in reszek)
                 {
-                    if (resz.Contains("'")) 
+                    if (resz.Contains("'"))
                     {
-                        
-                        string a = resz.Replace("'", ""); 
-                        res_knev.Add(ReplaceAccentMark(a).Trim()); 
+
+                        string a = resz.Replace("'", "");
+                        res_knev.Add(ReplaceAccentMark(a).Trim());
                     }
                 }
             }
 
-            foreach (string sor in vnev) 
+            foreach (string sor in vnev)
             {
-                string[] reszek = sor.Split(','); 
-                foreach (string resz in reszek) 
+                string[] reszek = sor.Split(',');
+                foreach (string resz in reszek)
                 {
-                    if (resz.Contains("'")) 
+                    if (resz.Contains("'"))
                     {
-                        
-                        string a = resz.Replace("'", ""); 
+
+                        string a = resz.Replace("'", "");
                         res_vnev.Add(ReplaceAccentMark(a).Trim());
                     }
                 }
@@ -307,33 +313,33 @@ namespace KM_gokart
 
             List<Versenyzo> versenyzok = new List<Versenyzo>();
 
-            Random rand = new Random(); 
-            DateTime ma = DateTime.Now; 
+            Random rand = new Random();
+            DateTime ma = DateTime.Now;
 
             for (int i = 0; i < count; i++)
             {
-                int randomEv = rand.Next(1950, ma.Year + 1); 
+                int randomEv = rand.Next(1950, ma.Year + 1);
                 int randomHo = rand.Next(1, ma.Month + 1);
-                int randomNap = rand.Next(1, DateTime.DaysInMonth(randomEv, randomHo)); 
+                int randomNap = rand.Next(1, DateTime.DaysInMonth(randomEv, randomHo));
 
-                DateTime datumString = new DateTime(randomEv, randomHo, randomNap); 
+                DateTime datumString = new DateTime(randomEv, randomHo, randomNap);
 
                 string chosenVnev = res_vnev[rand.Next(0, res_vnev.Count - 1)];
-                string chosenKnev = res_knev[rand.Next(0, res_knev.Count - 1)]; 
+                string chosenKnev = res_knev[rand.Next(0, res_knev.Count - 1)];
 
                 versenyzok.Add(new Versenyzo(
-                    chosenVnev, 
-                    chosenKnev, 
-                    new DateTime( 
-                        randomEv,  
-                        randomHo, 
-                        randomNap), 
-                    ma.Year - 18 > randomEv ? true : false, 
-                    "Go-" + chosenVnev + chosenKnev + "-" + datumString.ToString("yyyyMMdd"), 
-                    chosenVnev.ToLower() + "." + chosenKnev.ToLower() + "@gmail.com" 
-                    )); 
+                    chosenVnev,
+                    chosenKnev,
+                    new DateTime(
+                        randomEv,
+                        randomHo,
+                        randomNap),
+                    ma.Year - 18 > randomEv ? true : false,
+                    "Go-" + chosenVnev + chosenKnev + "-" + datumString.ToString("yyyyMMdd"),
+                    chosenVnev.ToLower() + "." + chosenKnev.ToLower() + "@gmail.com"
+                    ));
             }
-            return versenyzok; 
+            return versenyzok;
         }
 
         static void PrintOut(Dictionary<string, List<string>> foglalasok)
@@ -360,25 +366,25 @@ namespace KM_gokart
                 List<int> orak = new List<int>();
                 List<int> tartamLista = new List<int>();
 
-                for(int i = 0; i < datumok.Count; i++)
-        {
-                if (datumok[i][0] == idopont)
+                for (int i = 0; i < datumok.Count; i++)
                 {
-                    orak.Add(int.Parse(datumok[i][2]));
-                    tartamLista.Add(int.Parse(tartamok[i]));
+                    if (datumok[i][0] == idopont)
+                    {
+                        orak.Add(int.Parse(datumok[i][2]));
+                        tartamLista.Add(int.Parse(tartamok[i]));
+                    }
                 }
-            }
 
-            for (int k = 0; k < 11; k++) 
+                for (int k = 0; k < 11; k++)
                 {
                     int ora = 8 + k;
                     bool foglalt = false;
 
                     for (int i = 0; i < orak.Count; i++)
-                        {
-                        int kezd = orak[i];                
-                        int tartam = int.Parse(tartamok[i]); 
-                        int veg = kezd + tartam;      
+                    {
+                        int kezd = orak[i];
+                        int tartam = int.Parse(tartamok[i]);
+                        int veg = kezd + tartam;
 
 
                         if (ora >= kezd && ora < veg)
@@ -389,16 +395,16 @@ namespace KM_gokart
                     }
 
                     if (foglalt)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.Write("X\t");
-                        }
-                    else
-                        {
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.Write("O\t");
-                        }
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("X\t");
                     }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write("O\t");
+                    }
+                }
 
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.White;
@@ -407,14 +413,16 @@ namespace KM_gokart
             }
         }
 
-            static void Main(string[] args)
-            {
+        static void Main(string[] args)
+        {
             Console.ForegroundColor = ConsoleColor.White;
             //Console.WriteLine(res_vnev[rand.Next(0, res_vnev.Count - 1)] + " " + res_knev[rand.Next(0, res_knev.Count-1)]);
 
             foglalasok = new Dictionary<string, List<string>>();
 
-            List<Versenyzo> versenyzok = CreateVersenyzok(150);
+            Random rnd = new Random();
+
+            List<Versenyzo> versenyzok = CreateVersenyzok(rnd.Next(20, 150+1));
 
             bool run = true;
             bool kiiratva = false;
@@ -439,7 +447,7 @@ namespace KM_gokart
                         Fejlec();
                         if (!(kiiratva))
                         {
-                            Console.WriteLine("\nVersenyzők: ");
+                            Console.WriteLine("\nVersenyzők: " + " " + versenyzok.Count);
                             foreach (var v in versenyzok)
                             {
                                 Console.Write(v + "\n");
@@ -455,9 +463,9 @@ namespace KM_gokart
                         Console.WriteLine();
                         string cim = "Jelenlegi foglalások";
                         Console.WriteLine(cim);
-                        for(int i = 0; i < cim.Length; i++) Console.Write("-");
+                        for (int i = 0; i < cim.Length; i++) Console.Write("-");
                         Console.WriteLine();
-                        foreach(KeyValuePair<string, List<string>> f in foglalasok) 
+                        foreach (KeyValuePair<string, List<string>> f in foglalasok)
                         {
                             Console.WriteLine($"\t{f.Key}: dátum:{f.Value[0]} tartam(óra):{f.Value[1]} óra:{f.Value[2]}");
                         }
@@ -493,7 +501,7 @@ namespace KM_gokart
             }
             Console.ReadKey();
 
-            
+
         }
     }
 }
