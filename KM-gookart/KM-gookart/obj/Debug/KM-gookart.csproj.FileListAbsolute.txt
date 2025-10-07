@@ -1,0 +1,8 @@
+C:\Users\Kecskeméti Milán\Documents\GitHub\KM-gookart\KM-gookart\bin\Debug\KM-gookart.exe.config
+C:\Users\Kecskeméti Milán\Documents\GitHub\KM-gookart\KM-gookart\bin\Debug\KM-gookart.exe
+C:\Users\Kecskeméti Milán\Documents\GitHub\KM-gookart\KM-gookart\bin\Debug\KM-gookart.pdb
+C:\Users\Kecskeméti Milán\Documents\GitHub\KM-gookart\KM-gookart\obj\Debug\KM-gookart.csproj.AssemblyReference.cache
+C:\Users\Kecskeméti Milán\Documents\GitHub\KM-gookart\KM-gookart\obj\Debug\KM-gookart.csproj.CoreCompileInputs.cache
+C:\Users\Kecskeméti Milán\Documents\GitHub\KM-gookart\KM-gookart\obj\Debug\KM-gookart.exe
+C:\Users\Kecskeméti Milán\Documents\GitHub\KM-gookart\KM-gookart\obj\Debug\KM-gookart.pdb
+C:\Users\Kecskeméti Milán\Documents\GitHub\KM-gookart\KM-gookart\obj\Debug\KM-gookart.exe.config

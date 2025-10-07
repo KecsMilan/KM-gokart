@@ -140,7 +140,7 @@ namespace KM_gokart
                     Console.Write("Tartam(1óra vagy 2óra): ");
                     int tartam = int.Parse(Console.ReadLine());
 
-                    if (foglalasokDatum.Any(x => Convert.ToDateTime(x) < Datum))
+                    if (foglalasokDatum.Any(x => Convert.ToDateTime(x) <= Datum))
                     {
                         foglalasok[goid] = new List<string>
                         {
